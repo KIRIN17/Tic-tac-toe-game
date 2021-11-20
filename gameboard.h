@@ -6,10 +6,11 @@
 
 #include <string>
 #include "DynamicArray.h"
+#include "Functions.h"
 
 class Tile{
 public:
-    std::string value {};
+    std::string value {" "};
 
     Tile& operator = (const std::string newValue){
         value = newValue;
@@ -22,6 +23,7 @@ public:
     bool operator != (const std::string other){
         return other != value;
     }
+
 };
 
 class GameBoard : public QAbstractListModel
@@ -31,7 +33,7 @@ class GameBoard : public QAbstractListModel
 
 public:
     int result = -1;
-    static constexpr size_t defaultPuzzleDimension{3};
+    static constexpr size_t defaultPuzzleDimension{N};
     GameBoard(const size_t boardDimension = defaultPuzzleDimension,
               QObject* parent = nullptr);
 

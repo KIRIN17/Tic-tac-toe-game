@@ -1,7 +1,6 @@
 #include "gameboard.h"
 #include <algorithm>
 #include <random>
-#include "Functions.h"
 #include <stdlib.h>
 
 GameBoard::GameBoard(const size_t boardDimension, QObject *parent) :
@@ -10,10 +9,9 @@ GameBoard::GameBoard(const size_t boardDimension, QObject *parent) :
     m_boardSize {m_dimension * m_dimension}
 {
     m_rawBoard.Resize(m_boardSize);
-    for(int i = 0;i<m_rawBoard.GetSize();i++){
+    for(int i = 0; i < m_rawBoard.GetSize(); ++i){
         m_rawBoard[i].value = " ";
     }
-
 }
 
 bool GameBoard::move(int index)
@@ -44,26 +42,44 @@ bool GameBoard::move(int index)
         return true;
     }
 
-    if(result != -1)
-        exit(0);
+    if(result != -1){
+        for(int i = 0;i<m_rawBoard.GetSize();++i){
+            m_rawBoard[i] = empty_cell;
+        }
+        result = -1;
+        emit dataChanged(createIndex(0,0),createIndex(m_boardSize,0));
+        return true;
+    }
+
 
 
     if(is_valid_move(index,m_rawBoard)){
 
-        m_rawBoard[index].value = "X";
-        AI_move(m_rawBoard);
-
-        if(is_draw(m_rawBoard))
-            result = 0;
-
-        if(is_over(m_rawBoard,"X"))
+        m_rawBoard[index].value = user_char;
+        if(is_over(m_rawBoard,user_char)){
             result = 1;
+            emit dataChanged(createIndex(0,0),createIndex(m_boardSize,0));
+            return true;
+        }
 
-        if(is_over(m_rawBoard,"O"))
+        AI_move(m_rawBoard);
+        if(is_over(m_rawBoard,AI_char)){
             result = 2;
+            emit dataChanged(createIndex(0,0),createIndex(m_boardSize,0));
+            return true;
+        }
+
+        if(is_draw(m_rawBoard)){
+            result = 0;
+            emit dataChanged(createIndex(0,0),createIndex(m_boardSize,0));
+            return true;
+        }
+
+
 
 
         emit dataChanged(createIndex(0,0),createIndex(m_boardSize,0));
+        return true;
 
     }
 
